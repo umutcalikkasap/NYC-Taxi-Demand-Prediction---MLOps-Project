@@ -1,0 +1,73 @@
+groups:
+  - name: prediction_api_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(taxi_predictions_total{status="error"}[5m])
+          /
+          rate(taxi_predictions_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: prediction-api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for endpoint {{ $labels.endpoint }}"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(taxi_prediction_latency_seconds_bucket[5m])
+          ) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          service: prediction-api
+        annotations:
+          summary: "High prediction latency"
+          description: "p95 latency is {{ $value }}s for endpoint {{ $labels.endpoint }}"
+
+      - alert: ModelNotLoaded
+        expr: taxi_model_info == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: prediction-api
+        annotations:
+          summary: "Model not loaded"
+          description: "Prediction API is running but model is not loaded"
+
+      - alert: APIDown
+        expr: up{job="taxi-prediction-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: prediction-api
+        annotations:
+          summary: "API is down"
+          description: "Prediction API has been down for more than 2 minutes"
+
+      - alert: PredictionDriftDetected
+        expr: |
+          abs(
+            avg_over_time(taxi_prediction_value[1h]) -
+            avg_over_time(taxi_prediction_value[24h] offset 7d)
+          ) > 10
+        for: 30m
+        labels:
+          severity: info
+          service: prediction-api
+        annotations:
+          summary: "Prediction distribution shift detected"
+          description: "Average prediction has shifted by {{ $value }} compared to last week"
+
+      - alert: HighConcurrentRequests
+        expr: taxi_active_requests > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: prediction-api
+        annotations:
+          summary: "High number of concurrent requests"
+          description: "{{ $value }} concurrent requests being processed"

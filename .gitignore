@@ -1,0 +1,104 @@
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+
+# MLflow Tracking
+mlruns/
+mlartifacts/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg
+
+# Data Files (Large files - don't commit to git)
+*.parquet
+*.csv
+data/raw/
+data/processed/
+data/inference/*.parquet
+
+# Models (Optional - uncomment if models are too large)
+# models/production/*.json
+# models/production/*.pkl
+
+# Logs
+logs/
+*.log
+
+# Monitoring Reports (Generated locally, don't commit)
+monitoring/continual_learning_reports/
+monitoring/drift_reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Docker volumes (if using docker-compose)
+postgres_data/
+grafana_data/
+prometheus_data/
+
+# Test coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Claude Code
+.claude/

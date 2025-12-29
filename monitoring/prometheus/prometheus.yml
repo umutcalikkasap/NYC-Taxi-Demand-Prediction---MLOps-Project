@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'taxi-demand-monitor'
+
+scrape_configs:
+  - job_name: 'taxi-prediction-api'
+    static_configs:
+      - targets: ['api:8000']
+        labels:
+          service: 'prediction-api'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  - job_name: 'mlflow'
+    static_configs:
+      - targets: ['mlflow:5000']
+        labels:
+          service: 'mlflow'
+          environment: 'production'
+    scrape_interval: 30s
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+# Alerting configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Rule files for alerts
+# rule_files:
+#   - 'alerts/*.yml'

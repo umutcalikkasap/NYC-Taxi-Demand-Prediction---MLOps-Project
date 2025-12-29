@@ -1,0 +1,31 @@
+[Unit]
+Description=NYC Taxi Continual Learning Monitor Service
+After=network.target
+Documentation=https://github.com/your-org/nyc-taxi-prediction
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/nyc-taxi-prediction
+Environment="PATH=/home/ubuntu/nyc-taxi-prediction/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/home/ubuntu/nyc-taxi-prediction"
+
+# Run monitor daemon with 24h check interval
+ExecStart=/home/ubuntu/nyc-taxi-prediction/venv/bin/python -m src.continual_learning.monitor_service --interval 86400 --days-back 7
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=continual-learning
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,191 @@
+{
+  "dashboard": {
+    "title": "NYC Taxi Demand Prediction - MLOps Dashboard",
+    "tags": ["mlops", "taxi", "predictions"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "type": "graph",
+        "title": "Prediction Request Rate",
+        "targets": [
+          {
+            "expr": "rate(taxi_predictions_total{status=\"success\"}[5m])",
+            "legendFormat": "Success Rate ({{endpoint}})",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(taxi_predictions_total{status=\"error\"}[5m])",
+            "legendFormat": "Error Rate ({{endpoint}})",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Requests/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "type": "graph",
+        "title": "Prediction Latency (p50, p95, p99)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(taxi_prediction_latency_seconds_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(taxi_prediction_latency_seconds_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(taxi_prediction_latency_seconds_bucket[5m]))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Latency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+        "type": "stat",
+        "title": "Total Predictions (24h)",
+        "targets": [
+          {
+            "expr": "increase(taxi_predictions_total{status=\"success\"}[24h])",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+        "type": "stat",
+        "title": "Success Rate (24h)",
+        "targets": [
+          {
+            "expr": "sum(increase(taxi_predictions_total{status=\"success\"}[24h])) / sum(increase(taxi_predictions_total[24h])) * 100",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 95, "color": "yellow"},
+                {"value": 99, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+        "type": "gauge",
+        "title": "Active Requests",
+        "targets": [
+          {
+            "expr": "taxi_active_requests",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 50, "color": "yellow"},
+                {"value": 80, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "type": "graph",
+        "title": "Predicted Demand Distribution",
+        "targets": [
+          {
+            "expr": "rate(taxi_prediction_value_bucket[5m])",
+            "legendFormat": "Demand {{le}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Frequency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "type": "graph",
+        "title": "API Errors by Type",
+        "targets": [
+          {
+            "expr": "rate(taxi_api_errors_total[5m])",
+            "legendFormat": "{{error_type}} ({{endpoint}})",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "label": "Errors/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 8,
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "type": "graph",
+        "title": "Batch Prediction Size Distribution",
+        "targets": [
+          {
+            "expr": "rate(taxi_batch_prediction_size_bucket[5m])",
+            "legendFormat": "Batch size {{le}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Frequency"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 9,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "type": "table",
+        "title": "Feature Statistics (Drift Monitoring)",
+        "targets": [
+          {
+            "expr": "taxi_feature_value",
+            "legendFormat": "",
+            "refId": "A",
+            "format": "table"
+          }
+        ]
+      }
+    ]
+  }
+}
